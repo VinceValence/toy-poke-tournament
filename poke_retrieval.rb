@@ -58,4 +58,6 @@ def get_pokes(ids)
 
 end
 
-p get_pokes gen_ids
+if __FILE__ == $0:
+
+    p get_pokes gen_ids
