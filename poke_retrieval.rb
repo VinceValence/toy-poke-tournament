@@ -31,7 +31,6 @@ def parse_dmg_rel(dmg_rel)
 end
 
 def get_pokes(ids)
-
   all_pokes = []
 
   ids.each do |id|
@@ -49,15 +48,12 @@ def get_pokes(ids)
     clean_dmg_rel = parse_dmg_rel(dmg_rel)
 
     all_pokes.push({
-        name: name, base_stat: base_stat,
-        type: type_name, dmg_rel: clean_dmg_rel
-    })
+                     name: name, base_stat: base_stat,
+                     type: type_name, dmg_rel: clean_dmg_rel
+                   })
   end
 
   all_pokes
-
 end
 
-if __FILE__ == $0:
-
-    p get_pokes gen_ids
+p get_pokes gen_ids if __FILE__ == $PROGRAM_NAME
