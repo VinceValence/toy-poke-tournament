@@ -29,7 +29,7 @@ class Duel
 
     # NOTE: who attacked last is now in the defender var
     # and viceversa
-    p "#{defending.name} wins the duel against" \
+    p "#{defending.name} wins the duel against " \
       "#{attacking.name} after #{turns_played} turns!"
   end
 end

@@ -3,14 +3,16 @@
 class Pokemon
   # I don't think this is the right place for this.
   # Maybe I should have put it in poke_retrieval.
-  @dmg_translator = {
-    'double_damage_from': 2,
-    'double_damage_to': 2,
-    'half_damage_from': 1 / 2,
-    'half_damage_to': 1 / 2,
-    'no_damage_from': 0,
-    'no_damage_to': 0
+  @@dmg_translator = {
+    'double_damage_from': 2.0,
+    'double_damage_to': 2.0,
+    'half_damage_from': 0.5,
+    'half_damage_to': 0.5,
+    'no_damage_from': 0.1,
+    'no_damage_to': 0.1
   }
+
+  attr_reader :name, :type, :dead, :beat
 
   def initialize(name, type, base_stat, dmg_rel)
     @name = name
@@ -19,6 +21,7 @@ class Pokemon
     @dmg_rel = dmg_rel
     @hp = base_stat * 1.5
     @dead = false
+    @beat = []
   end
 
   def attack(other)
@@ -30,7 +33,7 @@ class Pokemon
       # if the other's type is in the relations array
       if types.include? other.type
         # change the multiplier accordingly
-        dmg_multiplier = @dmg_translator[relation]
+        dmg_multiplier = @@dmg_translator[relation.to_sym]
       end
     end
     # damage is @base_stat under a logarithm and is scaled
@@ -48,10 +51,14 @@ class Pokemon
       # if the other's type is in the relations array
       if types.include? other.type
         # change the multiplier accordingly
-        dmg_multiplier = @dmg_translator[relation]
+        dmg_multiplier = @@dmg_translator[relation.to_sym]
+
       end
     end
     @hp -= incoming_dmg * dmg_multiplier
-    @dead = true if @hp <= 0
+    return unless @hp <= 0
+
+    @dead = true
+    other.beat.push(self)
   end
 end
