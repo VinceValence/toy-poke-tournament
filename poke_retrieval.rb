@@ -55,5 +55,3 @@ def get_pokes(ids)
 
   all_pokes
 end
-
-p get_pokes gen_ids if __FILE__ == $PROGRAM_NAME
