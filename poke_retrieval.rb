@@ -3,16 +3,19 @@
 require 'json'
 require 'net/http'
 
+POKE_RANGE = (1..151).freeze
+PARTICIPANTS = 8
+
 def gen_ids
   # Generate eight ids in the range 1..151,
   # making sure they are different.
 
   last_poke_ids = []
   poke_id = 0
-  Array.new(8) do
+  Array.new(PARTICIPANTS) do
     last_poke_ids.push poke_id
     # generate a new, different id
-    poke_id = rand(1..151) while last_poke_ids.include? poke_id
+    poke_id = rand(POKE_RANGE) while last_poke_ids.include? poke_id
     poke_id
   end
 end

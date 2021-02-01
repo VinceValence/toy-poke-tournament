@@ -3,19 +3,18 @@
 require_relative 'messages'
 
 class Duel
+  TURN_LIMIT = 10
+
   def initialize(participants)
     @participants = participants
   end
 
-  def duel
-    DMsgs.present_participants(@participants)
-
+  def begin_attack_cycle
     who_died = -> { @participants.find(&:dead) }
     dead = nil
     attacking = @participants[0]
     defending = @participants[1]
     turns_played = 0
-    turn_limit_reached = false
     until dead
       # perform the attack
       attacking.attack(defending)
@@ -24,30 +23,38 @@ class Duel
       dead = who_died.call
 
       # swap who attacks and who defends
-      old_attacking = attacking
-      attacking = defending
-      defending = old_attacking
+      attacking, defending = defending, attacking
 
       turns_played += 1
-      # turn limit
+
+      # stop fight if turn limit is reached
       break if turns_played == TURN_LIMIT
     end
+    [dead, turns_played]
+  end
 
-    winner = @participants.max_by {|p| p.hp}
-    loser = @participants.min_by {|p| p.hp}
+  def duel
+    DMsgs.present_participants(@participants)
+
+    # dead is the pokemon who died
+    # or an empty array if no one died
+    dead, turns_played = begin_attack_cycle
+
+    # determine winner by remaining hp
+    winner = @participants.max_by(&:hp)
+    loser = @participants.min_by(&:hp)
+
+    # winner's hp resets to maximum for next duel
     winner.reset_hp
+
+    # Announce winner and type of victory
     if dead
-      puts "#{winner.name} wins the duel against " \
-        "#{loser.name} after #{turns_played} turns, " \
-        "having reduced its opponent's health to 0!"
+      DMsgs.win_duel_by_kill(winner, loser, turns_played)
     else
-      # whoever has more hp wins, because turns ran out
-      puts "#{winner.name} (with #{winner.hp.round(0)} hp remaining) wins the " \
-        "duel against " \
-        "#{loser.name} (with #{loser.hp.round(0)} hp remaining), " \
-        "having fought until the turn limit of #{turns_played}!"
-      # we need to kill the pokemon anyway. A better term would be disqualified
-      loser.dead = true
+      DMsgs.win_duel_turn_limit(winner, loser, turns_played)
     end
+
+    # disqualify loser
+    loser.disqualified = true
   end
 end
